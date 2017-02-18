@@ -1,5 +1,7 @@
 ## These two functions will create a matrix which can have the inverse
 ## calculated of them and store them in the cache.
+## mthompsonlxi (18/02/2017)
+
 
 ## The makeCacheMatrix() function first checks to see if a cached matrix
 ## exists and checks if it is square. However if no cached matrix exists
@@ -9,19 +11,22 @@
 makeCacheMatrix <- function(x = matrix()) {
       
       if(exists("m_cache") && nrow(m_cache) == ncol(m_cache)) {
-            return(message("Square matrix already in cache"))
+            message("Square matrix already in cache")
+            return(m_cache)
+      } else if(exists("m_cache") && nrow(m_cache) != ncol(m_cache)) {
+            message("Matrix in cache is not Square")
+            return()
       }
       
       m <- x
       
-      if(nrow(m) == ncol(m)) {
+      if(nrow(m) == ncol(m)){
             m_cache <<- m
-            message("Matrix specified is square and is saved as \"m_cache\"")
-            m_cache
-      } else if(nrow(m) != ncol(m)) {
+            message("Specified Matrix is square and saved as \"m_cache\"")
+            return(m_cache)
+      } else {
             return(message("Matrix is NOT square and thus the inverse cannot be calculated"))
       }
-
 }
 
 ## The cacheSolve() function returns the inverse of the matrix specified 
