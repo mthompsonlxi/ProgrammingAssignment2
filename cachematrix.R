@@ -3,45 +3,47 @@
 ## mthompsonlxi (18/02/2017)
 
 
-## The makeCacheMatrix() function first checks to see if a cached matrix
-## exists and checks if it is square. However if no cached matrix exists
-## it will check to see if the specified matrix is square and save this 
-## in the cache. Otherwise it will return an error.
+## The makeCacheMatrix() will create an inverse matrix if called upon
+## by cacheSolve() otherwise it sets calls for makeCacheMatrix() and
+## it's functions.
 
 makeCacheMatrix <- function(x = matrix()) {
-      
-      if(exists("m_cache") && nrow(m_cache) == ncol(m_cache)) {
-            message("Square matrix already in cache")
-            return(m_cache)
-      } else if(exists("m_cache") && nrow(m_cache) != ncol(m_cache)) {
-            message("Matrix in cache is not Square")
-            return()
+      # Through out this the inverse matrix will be referred to as "im"
+      im <- NULL
+      # If the matrix has not been created and/or has been changed create
+      # a new object for this and clear the existing object
+      set <- function(y) {
+            x <<- y
+            im <<- NULL
       }
-      
-      m <- x
-      
-      if(nrow(m) == ncol(m)){
-            m_cache <<- m
-            message("Specified Matrix is square and saved as \"m_cache\"")
-            return(m_cache)
-      } else {
-            return(message("Matrix is NOT square and thus the inverse cannot be calculated"))
-      }
+      # Retrieve the new matrix to be solved
+      get <- function() x
+      # Solve the matrix and store in cache
+      setim <- function(solve) im <<- solve
+      # Gets the inverse if it is already stored in the cache
+      getim <- function() im
+      # These values are passed to makeCacheMatrix()
+      list(set = set, get = get,
+           setim = setim,
+           getim = getim)
+
 }
 
-## The cacheSolve() function returns the inverse of the matrix specified 
-## in the arguments UNLESS an existing inverse matrix has already been
-## saved in the global environment.
+## The cacheSolve() function checks to see if an existing inverse 
+## matrix exists and if so will return this. Otherwise it calls
+## makeCacheMatrix() to create the inverse matrix.
 
-cacheSolve <- function(x = m_cache, ...) {
-
-      if(exists("m_inverse")) {
-            message("Existing Inverse Matrix in cache, displaying this instead \nof specified Square Matrix. Saved as \"m_inverse\"")
-            return(m_inverse)
+cacheSolve <- function(x, ...) {
+      # Checks to see if an existing inverse matrix exists and if it 
+      # does returns this
+      im <- x$getim()
+      if(!is.null(im)) {
+            message("getting cached matrix")
+            return(im)
       }
-      
-      m_inverse <<- solve(x)
-      message("Matrix saved as \"m_inverse\"")
-      m_inverse
-
+      # If no inverse matrix exists, then solves for this and sets it
+      # in the cache before returning this
+      im <- solve(x$get(), ...)
+      x$setim(im)
+      im
 }
